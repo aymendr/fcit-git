@@ -31,7 +31,7 @@ git commit -m "Initial commit"
 
 **Instructions:**
 1. Créez une nouvelle branche nommée "feature-navbar".
-2. Modifiez le fichier "index.html" en ajoutant du texte de police <h1>
+2. Modifiez le fichier "index.html" en ajoutant du nouveau code
 3. Ajoutez ces modifications à la zone de staging.
 4. Faites un commit avec le message "Added navbar".
 5. Revenez à la branche principale (master).
