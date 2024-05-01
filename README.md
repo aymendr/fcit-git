@@ -184,6 +184,30 @@ git co <nom_de_la_branche>
 **Correction:**
 Créez des scripts exécutables dans le répertoire `.git/hooks/` de votre dépôt, tels que `pre-commit` et `post-merge`, qui effectuent les actions souhaitées.
 
+## Git REBASE
+
+Le rebase interactif est une fonctionnalité puissante de Git qui permet de réécrire l'historique des commits de manière interactive. Contrairement à un rebase standard, où Git réapplique simplement les commits d'une branche sur une autre, le rebase interactif donne à l'utilisateur un contrôle total sur chaque commit à réappliquer, ainsi que sur l'ordre dans lequel ils sont appliqués.
+
+Voici comment utiliser le rebase interactif :
+
+1. **Commencez par un rebase interactif :** Lancez le rebase interactif en utilisant la commande `git rebase -i <commit>` où `<commit>` est le dernier commit que vous souhaitez réappliquer (généralement, cela sera le commit juste avant celui que vous voulez modifier).
+
+2. **Choisissez les commits à modifier :** Une fois que vous lancez le rebase interactif, Git ouvrira un éditeur de texte avec une liste des commits à réappliquer. Chaque ligne commencera par le mot "pick" suivi du code de hachage (hash) et du message de chaque commit.
+
+3. **Modifiez l'ordre des commits :** Vous pouvez réorganiser l'ordre des commits simplement en réorganisant les lignes dans l'éditeur de texte. Ceci est utile si vous souhaitez modifier l'ordre chronologique des commits.
+
+4. **Combinez des commits :** Si vous souhaitez fusionner plusieurs commits en un seul, changez le mot "pick" en "squash" ou simplement en "s" pour les commits que vous voulez combiner. Cela vous permet de condenser plusieurs commits en un seul tout en conservant leurs modifications.
+
+5. **Modifier les messages de commit :** Vous pouvez également modifier les messages de commit en changeant le texte après "pick" pour chaque commit.
+
+6. **Sauvegardez et quittez l'éditeur :** Une fois que vous avez terminé d'éditer la liste des commits, sauvegardez et quittez l'éditeur. Git appliquera alors les modifications selon vos instructions.
+
+7. **Résolvez les conflits (si nécessaire) :** Si des conflits surviennent pendant le processus de rebase interactif, Git marquera le rebase en pause et vous donnera l'opportunité de résoudre ces conflits. Après avoir résolu les conflits, vous pouvez continuer le rebase en utilisant la commande `git rebase --continue`.
+
+8. **Terminez le rebase :** Une fois que vous avez terminé de réécrire l'historique des commits, Git finalisera le rebase et appliquera les modifications. Si tout se passe bien, vous aurez un historique de commits réorganisé et édité selon vos spécifications.
+
+Le rebase interactif est une technique avancée et puissante, mais elle peut également être risquée si elle est mal utilisée. Il est important de comprendre que le rebase modifie l'historique des commits, ce qui peut entraîner des problèmes si vous travaillez en collaboration avec d'autres développeurs sur le même dépôt. Il est recommandé de n'utiliser le rebase interactif que sur des branches locales et de ne pas réécrire l'historique des commits sur des branches partagées.
+
 ## Voici quelques exercices axés sur l'utilisation de git rebase :
 
 ### Exercice 1: Rebase interactif pour combiner des commits
