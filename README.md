@@ -911,3 +911,236 @@ Supposons que vous ayez une branche `feature/payment` avec un commit que vous vo
 
 Ce lab couvre une série de tâches avancées dans Git : gestion des branches, résolution de conflits, manipulation de l’historique, utilisation des sous-modules, automatisation des tests, et gestion des hooks. Ces compétences vous permettront de gérer des projets complexes avec plusieurs développeurs et de maintenir un historique propre tout en intégrant
 
+# Exercice Avancé : Utilisation de `git rebase -i` (Rebase interactif)
+
+Cet exercice vous permettra de comprendre et de maîtriser l’utilisation avancée de **`git rebase -i`** (rebase interactif), une fonctionnalité puissante pour manipuler l’historique des commits dans Git. Vous apprendrez à réécrire l’historique, à combiner des commits, à réorganiser les commits, et à résoudre les conflits lors d'un rebase.
+
+### Contexte
+Vous travaillez sur un projet avec plusieurs commits, mais l'historique des commits est désordonné. Il y a des commits inutiles, des messages de commit peu clairs, et certains commits devraient être combinés pour avoir un historique plus propre. Vous allez utiliser `git rebase -i` pour réorganiser et nettoyer l’historique des commits.
+
+### Objectifs
+
+- Réorganiser les commits.
+- Fusionner (squash) plusieurs commits en un seul.
+- Modifier les messages de commit.
+- Supprimer des commits inutiles.
+- Corriger des erreurs dans les commits précédents.
+- Résoudre des conflits pendant un rebase interactif.
+
+---
+
+### Préparation de l'exercice
+
+Avant de commencer, il vous faut un projet Git avec plusieurs commits. Vous pouvez créer un petit projet en utilisant les étapes suivantes :
+
+1. **Initialiser un dépôt Git local :**
+   ```bash
+   mkdir rebase-lab
+   cd rebase-lab
+   git init
+   ```
+
+2. **Créer des commits pour simuler un historique chaotique :**
+
+   ```bash
+   # Créer un fichier initial et committer
+   echo "Initial commit" > file.txt
+   git add file.txt
+   git commit -m "Initial commit"
+
+   # Ajouter une fonctionnalité A (petit changement)
+   echo "Feature A" >> file.txt
+   git add file.txt
+   git commit -m "Feature A"
+
+   # Ajouter une fonctionnalité B (petit changement)
+   echo "Feature B" >> file.txt
+   git add file.txt
+   git commit -m "Feature B"
+
+   # Ajouter une fonctionnalité C (petit changement)
+   echo "Feature C" >> file.txt
+   git add file.txt
+   git commit -m "Feature C"
+
+   # Erreur dans le message de commit, on va la corriger
+   git commit --amend -m "Correction du message pour Feature C"
+   
+   # Faire un commit sans réelle modification
+   git commit --allow-empty -m "Commit inutile"
+
+   # Ajouter une fonctionnalité D (petit changement)
+   echo "Feature D" >> file.txt
+   git add file.txt
+   git commit -m "Feature D"
+   ```
+
+   À ce stade, vous avez 6 commits dans votre historique avec des changements qui peuvent être optimisés.
+
+---
+
+### Étape 1: Lancer un Rebase Interactif
+
+1. **Afficher l’historique des commits :**
+   ```bash
+   git log --oneline
+   ```
+
+   Vous devriez voir quelque chose comme ceci :
+
+   ```
+   <sha1> Feature D
+   <sha1> Commit inutile
+   <sha1> Correction du message pour Feature C
+   <sha1> Feature C
+   <sha1> Feature B
+   <sha1> Feature A
+   <sha1> Initial commit
+   ```
+
+2. **Lancer un rebase interactif sur les 6 derniers commits :**
+   ```bash
+   git rebase -i HEAD~6
+   ```
+
+   Cela va ouvrir un éditeur de texte avec une liste de commits :
+
+   ```
+   pick <sha1> Feature D
+   pick <sha1> Commit inutile
+   pick <sha1> Correction du message pour Feature C
+   pick <sha1> Feature C
+   pick <sha1> Feature B
+   pick <sha1> Feature A
+   pick <sha1> Initial commit
+   ```
+
+   - Chaque ligne commence par un mot-clé (`pick`).
+   - `pick` signifie que vous gardez ce commit tel quel.
+
+---
+
+### Étape 2: Manipuler les commits avec `git rebase -i`
+
+Vous allez maintenant réorganiser, fusionner, modifier, et supprimer certains commits pour avoir un historique plus propre.
+
+#### 2.1 Réorganiser les commits
+
+Vous souhaitez que le commit "Feature A" vienne après "Feature C". Pour ce faire, changez l’ordre des lignes :
+
+```
+pick <sha1> Feature D
+pick <sha1> Commit inutile
+pick <sha1> Correction du message pour Feature C
+pick <sha1> Feature A
+pick <sha1> Feature B
+pick <sha1> Initial commit
+```
+
+En réorganisant les commits, vous pouvez déplacer le commit "Feature A" après "Feature C".
+
+#### 2.2 Fusionner des commits avec `squash` (ou `s`)
+
+Vous avez deux commits inutiles que vous voulez combiner : **"Commit inutile"** et **"Correction du message pour Feature C"**. Pour les combiner, remplacez `pick` par `squash` (ou `s`) sur les lignes que vous voulez fusionner.
+
+```
+pick <sha1> Feature D
+squash <sha1> Commit inutile
+pick <sha1> Correction du message pour Feature C
+pick <sha1> Feature A
+pick <sha1> Feature B
+pick <sha1> Initial commit
+```
+
+Cela va appliquer le contenu de "Commit inutile" dans le commit suivant, tout en vous permettant de modifier le message de commit.
+
+#### 2.3 Modifier un commit avec `edit`
+
+Vous réalisez qu'il y a un problème dans **"Feature B"** et que vous souhaitez le corriger. Vous pouvez choisir de l'éditer en utilisant `edit` :
+
+```
+pick <sha1> Feature D
+squash <sha1> Commit inutile
+pick <sha1> Correction du message pour Feature C
+pick <sha1> Feature A
+edit <sha1> Feature B
+pick <sha1> Initial commit
+```
+
+Cela vous permettra de modifier le commit **"Feature B"** avant de poursuivre le rebase.
+
+---
+
+### Étape 3: Appliquer le rebase
+
+Après avoir effectué vos modifications, **enregistrez et fermez l’éditeur** pour lancer le rebase.
+
+#### 3.1 Résoudre les conflits
+
+Pendant le rebase, Git pourrait rencontrer des conflits, surtout si des fichiers ont été modifiés dans plusieurs commits. Si cela se produit :
+
+1. Git vous alertera et vous demandera de résoudre les conflits.
+2. Ouvrez les fichiers en conflit et résolvez-les manuellement.
+3. Une fois les conflits résolus, ajoutez les fichiers modifiés :
+
+   ```bash
+   git add <fichier_conflit>
+   ```
+
+4. Continuez le rebase :
+
+   ```bash
+   git rebase --continue
+   ```
+
+#### 3.2 Modifier un commit avec `edit`
+
+Si vous avez choisi d’éditer le commit **"Feature B"**, Git s’arrêtera et vous permettra de modifier ce commit. Vous pouvez maintenant apporter les modifications nécessaires dans les fichiers concernés, puis effectuer un commit avec :
+
+```bash
+git commit --amend
+```
+
+Une fois la modification terminée, continuez le rebase :
+
+```bash
+git rebase --continue
+```
+
+---
+
+### Étape 4: Finaliser et nettoyer l’historique
+
+Après avoir terminé le rebase, vous aurez un historique plus propre avec les modifications suivantes :
+
+- **Réorganisation des commits** : "Feature A" se trouve après "Feature C".
+- **Fusion des commits** : "Commit inutile" et "Correction du message pour Feature C" ont été fusionnés en un seul commit.
+- **Modification d’un commit** : Vous avez corrigé le commit "Feature B".
+
+1. Vérifiez l’historique des commits à l’aide de :
+
+   ```bash
+   git log --oneline
+   ```
+
+   Vous devriez voir quelque chose comme :
+
+   ```
+   <sha1> Feature D
+   <sha1> Feature A
+   <sha1> Feature C
+   <sha1> Feature B (modifié)
+   <sha1> Initial commit
+   ```
+
+2. Si vous êtes satisfait du résultat, poussez les modifications sur le dépôt distant. Si vous avez réécrit l’historique (par exemple, en utilisant `--amend` ou `rebase`), vous devrez peut-être utiliser l’option `--force` :
+
+   ```bash
+   git push origin main --force
+   ```
+
+---
+
+### Conclusion
+
+Cet exercice vous a permis de comprendre comment utiliser **`git rebase -i`** pour effectuer des modifications avancées sur l’historique des commits. Vous avez appris à réorganiser les commits, à fusionner des commits, à modifier des messages de commit, à supprimer des commits inutiles et à résoudre des conflits pendant un rebase. Ces compétences sont essentielles pour garder un historique propre et faciliter la collaboration dans des projets complexes.
